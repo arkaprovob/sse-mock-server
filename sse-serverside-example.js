@@ -26,10 +26,10 @@ app.get('/sse/:id', function (req, res) {
 
   const CODE = ["WEBSITE_CREATE", "WEBSITE_DELETE", "WEBSITE_UPDATE"];
   const namespace = ["one.redhat.com", "access.redhat.com", "activity.redhat.com", "spaship.redhat.com"];
-  const cr_name1 = ["SPA 112", "SPA 113", "SPA 114", "SPA 115"];
-  const cr_name2 = ["SPA 212", "SPA 213", "SPA 214", "SPA 215"];
-  const cr_name3 = ["SPA 312", "SPA 313", "SPA 314", "SPA 315"];
-  const cr_name4 = ["SPA 412", "SPA 413", "SPA 414", "SPA 415"];
+  const cr_name1 = ["Index", "Header", "Footer", "Contact us"];
+  const cr_name2 = ["Portfolio", "Examples", "Documentation", "Collaborate"];
+  const cr_name3 = ["ABout us", "Help", "Register", "Login"];
+  const cr_name4 = ["Add to cart", "Checkout", "Donation", "Welcome"];
 
   let intervalId = setInterval(function () {
     console.log(`*** Interval loop. event id: "${id}"`);
