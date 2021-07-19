@@ -1,6 +1,9 @@
-var express = require('express');
-var app = express();
+const { v4: uuidv4 } = require('uuid');
+var express = require('express')
+var cors = require('cors')
+var app = express()
 
+app.use(cors())
 
 const SSE_RESPONSE_HEADER = {
   'Connection': 'keep-alive',
@@ -36,42 +39,61 @@ app.get('/sse/:id', function (req, res) {
 
     const codeRandom = getRandom(3);
     const namespaceRandom = getRandom(4);
-    const crname  = () => {
-      if(namespaceRandom==0){
+    const crname = () => {
+      if (namespaceRandom == 0) {
         return cr_name1[getRandom(4)];
       }
-      if(namespaceRandom==1){
+      if (namespaceRandom == 1) {
         return cr_name2[getRandom(4)];
       }
-      if(namespaceRandom==2){
+      if (namespaceRandom == 2) {
         return cr_name3[getRandom(4)];
       }
-      if(namespaceRandom==3){
+      if (namespaceRandom == 3) {
         return cr_name4[getRandom(4)];
       }
-   }
-  // console.log(crname());
-    // Creates sending data:
-    data = {
-      id: "327c9ba5-2e58-475b-93ec-5e4237c6118e",
-      payload: {
-        cr_name: crname(),
-        namespace: namespace[namespaceRandom],
-        CODE: CODE[codeRandom],
-        message: "Website{config=WebsiteConfig{apiVersion='v1', metadata=null, envs={dev=Environment{branch='main', skipContexts=null, deployment=null}, prod=Environment{branch='prod', skipContexts=[/search, /search/api], deployment=DeploymentConfig{replicas='2', init=null, httpd=Container(args=[], command=[], env=[], envFrom=[], image=null, imagePullPolicy=null, lifecycle=null, livenessProbe=null, name=null, ports=[], readinessProbe=null, resources=ResourceRequirements(limits={cpu=500m, memory=250Mi}, requests={cpu=100m, memory=150Mi}, additionalProperties={}), securityContext=null, startupProbe=null, stdin=null, stdinOnce=null, terminationMessagePath=null, terminationMessagePolicy=null, tty=null, volumeDevices=[], volumeMounts=[], workingDir=null, additionalProperties={}), api=null}}}, components=[ComponentConfig{context='/template', kind='git', spec=ComponentSpec{url='https"
-      },
-      time: "2021-06-30T13:12:26.973934230"
     }
 
+    // Creates sending data:
+    const traceId = uuidv4();
+    const cr_name = crname();
+    const dateTime = new Date();
+    dateTime.setDate(getRandom(30));
+    dateTime.setMinutes(dateTime.getMinutes() - getRandom(30));
+
+    data = {
+      id: uuidv4(),
+      payload: {
+        cr_name: cr_name,
+        namespace: namespace[namespaceRandom],
+        CODE: CODE[codeRandom] + "_STARTED",
+        TraceId: traceId,
+        message: "Website{config=WebsiteConfig{apiVersion='v1', metadata=null, envs={dev=Environment{branch='main', skipContexts=null, deployment=null}, prod=Environment{branch='prod', skipContexts=[/search, /search/api], deployment=DeploymentConfig{replicas='2', init=null, httpd=Container(args=[], command=[], env=[], envFrom=[], image=null, imagePullPolicy=null, lifecycle=null, livenessProbe=null, name=null, ports=[], readinessProbe=null, resources=ResourceRequirements(limits={cpu=500m, memory=250Mi}, requests={cpu=100m, memory=150Mi}, additionalProperties={}), securityContext=null, startupProbe=null, stdin=null, stdinOnce=null, terminationMessagePath=null, terminationMessagePolicy=null, tty=null, volumeDevices=[], volumeMounts=[], workingDir=null, additionalProperties={}), api=null}}}, components=[ComponentConfig{context='/template', kind='git', spec=ComponentSpec{url='https"
+      },
+      time: dateTime
+    }
+
+
     //const payload = JSON.parse(data);
-    if (!data)
-      res.write(`:\n\n`);
-    else
-      res.write(`${JSON.stringify(data)}\n\n`);
-  }, 3000);
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
 
+    dateTime.setMinutes(dateTime.getMinutes() + getRandom(10));
 
-  res.write(`:\n\n`);
+    data = {
+      id: uuidv4(),
+      payload: {
+        cr_name: cr_name,
+        namespace: namespace[namespaceRandom],
+        CODE: CODE[codeRandom],
+        TraceId: traceId,
+        message: "Website{config=WebsiteConfig{apiVersion='v1', metadata=null, envs={dev=Environment{branch='main', skipContexts=null, deployment=null}, prod=Environment{branch='prod', skipContexts=[/search, /search/api], deployment=DeploymentConfig{replicas='2', init=null, httpd=Container(args=[], command=[], env=[], envFrom=[], image=null, imagePullPolicy=null, lifecycle=null, livenessProbe=null, name=null, ports=[], readinessProbe=null, resources=ResourceRequirements(limits={cpu=500m, memory=250Mi}, requests={cpu=100m, memory=150Mi}, additionalProperties={}), securityContext=null, startupProbe=null, stdin=null, stdinOnce=null, terminationMessagePath=null, terminationMessagePolicy=null, tty=null, volumeDevices=[], volumeMounts=[], workingDir=null, additionalProperties={}), api=null}}}, components=[ComponentConfig{context='/template', kind='git', spec=ComponentSpec{url='https"
+      },
+      time: dateTime
+    }
+
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+
+  }, 50);
 
   req.on("close", function () {
     let id = getEventId(req);
@@ -101,5 +123,3 @@ app.listen(5000, function () {
 function getRandom(max) {
   return Math.floor(Math.random() * max);
 }
-
-
